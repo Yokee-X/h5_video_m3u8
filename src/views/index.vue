@@ -1,15 +1,15 @@
 <!--
  * @Author: Yokee
  * @Date: 2021-07-14 10:10:47
- * @LastEditTime: 2021-07-19 18:17:46
+ * @LastEditTime: 2021-07-20 15:22:52
  * @FilePath: \h5video\src\views\index.vue
 -->
 <template>
     <div class="container">
-        <div class="videoContent" @click="videoControl">
+        <div class="videoContent" >
             <!-- video.js -->
             <!-- playsinline="true" 取消ios端自动全屏 -->
-            <!-- <video
+            <video
                 id="videoPlayer"
                 class="video-js vjs-default-skin vjs-big-play-centered"
                 style="width: 100%; height: 100%"
@@ -26,12 +26,18 @@
                         supports HTML5 video
                     </a>
                 </p>
-            </video> -->
+            </video>
 
             <!-- hls.js -->
-            <video ref="videoHls" class="video"></video>
-            <div class="pause" v-show="hlsPause"></div>
-            
+            <!-- <video
+                ref="videoHls"
+                class="video"
+                playsinline="true"
+                webkit-playsinline="true"
+                autoplay
+                muted
+            ></video>
+            <div class="pause" v-show="hlsPause"></div> -->
         </div>
         {{ number }}
         <div>{{ date }}</div>
@@ -59,8 +65,7 @@ export default {
                 fluid: true, //自适应宽高
                 // width: "100%",
                 // height: "100%",
-                poster:
-                    "https://img1.baidu.com/it/u=2699821401,1244104801&fm=26&fmt=auto&gp=0.jpg", //视频封面图片
+                poster: "https://img1.baidu.com/it/u=2699821401,1244104801&fm=26&fmt=auto&gp=0.jpg", //视频封面图片
                 sources: [
                     {
                         src: "http://ivi.bupt.edu.cn/hls/cctv1.m3u8",
@@ -69,119 +74,160 @@ export default {
                 ],
             },
             hlsPlayer: null,
-            hlsPause: true,
+            hlsPause: false,
+            videoSrc: "http://ivi.bupt.edu.cn/hls/cctv1.m3u8",
         };
     },
     mounted() {
-        // this.initVideo();
-        this.initHlsVideo();
+        this.initVideo();
+        // this.initHlsVideo();
     },
     methods: {
         initVideo() {
             let that = this;
-            this.player = videojs(
-                "videoPlayer",
-                this.options,
-                function onPlayerReady() {
-                    console.log("onPlayerReady", this);
-                    that.videoObj = this;
+            this.player = videojs("videoPlayer", this.options, function onPlayerReady() {
+                console.log("onPlayerReady", this);
+                that.videoObj = this;
 
-                    this.on("loadstart", function () {
-                        console.log("开始请求数据 ");
-                    });
-                    // this.on("progress", function () {
-                    //     console.log("正在请求数据 ");
-                    // });
-                    this.on("loadedmetadata", function () {
-                        console.log("获取资源长度完成 ");
-                    });
-                    this.on("canplaythrough", function () {
-                        console.log("视频源数据加载完成");
-                    });
-                    this.on("waiting", function () {
-                        console.log("等待数据");
-                    });
-                    this.on("play", function () {
-                        console.log("视频开始播放");
-                        that.pause = false;
-                    });
-                    this.on("playing", function () {
-                        console.log("视频播放中");
-                    });
-                    this.on("pause", function () {
-                        console.log("视频暂停播放");
-                        that.pause = true;
-                    });
-                    this.on("ended", function () {
-                        console.log("视频播放结束");
-                    });
-                    this.on("error", function () {
-                        console.log("加载错误");
-                    });
-                    this.on("seeking", function () {
-                        console.log("视频跳转中");
-                    });
-                    this.on("seeked", function () {
-                        console.log("视频跳转结束");
-                    });
-                    this.on("ratechange", function () {
-                        console.log("播放速率改变");
-                    });
-                    this.on("timeupdate", function () {
-                        console.log("播放时长改变");
-                    });
-                    this.on("volumechange", function () {
-                        console.log("音量改变");
-                    });
-                    this.on("stalled", function () {
-                        console.log("网速异常");
-                    });
+                this.on("loadstart", function() {
+                    console.log("开始请求数据 ");
+                });
+                // this.on("progress", function () {
+                //     console.log("正在请求数据 ");
+                // });
+                this.on("loadedmetadata", function() {
+                    console.log("获取资源长度完成 ");
+                });
+                this.on("canplaythrough", function() {
+                    console.log("视频源数据加载完成");
+                });
+                this.on("waiting", function() {
+                    console.log("等待数据");
+                });
+                this.on("play", function() {
+                    console.log("视频开始播放");
+                    that.pause = false;
+                });
+                this.on("playing", function() {
+                    console.log("视频播放中");
+                });
+                this.on("pause", function() {
+                    console.log("视频暂停播放");
+                    that.pause = true;
+                });
+                this.on("ended", function() {
+                    console.log("视频播放结束");
+                });
+                this.on("error", function() {
+                    console.log("加载错误");
+                });
+                this.on("seeking", function() {
+                    console.log("视频跳转中");
+                });
+                this.on("seeked", function() {
+                    console.log("视频跳转结束");
+                });
+                this.on("ratechange", function() {
+                    console.log("播放速率改变");
+                });
+                this.on("timeupdate", function() {
+                    console.log("播放时长改变");
+                });
+                this.on("volumechange", function() {
+                    console.log("音量改变");
+                });
+                this.on("stalled", function() {
+                    console.log("网速异常");
+                });
 
-                    this.on("click", function (event) {
-                        console.log(
-                            "触发click事件啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
-                            event
-                        );
-                        if (that.pause) {
-                            that.player.play();
-                        } else {
-                            that.player.pause();
-                        }
-                        that.number++;
-                        that.pause = !that.pause;
-                    });
-                }
-            );
-            this.player.on("click", function (e) {
-                console.log("click事件", e);
+                // this.on("click", function(event) {
+                //     console.log("触发click事件啊啊啊啊啊啊啊啊啊啊啊啊啊啊", event);
+                //     if (that.pause) {
+                //         that.player.play();
+                //     } else {
+                //         that.player.pause();
+                //     }
+                //     that.number++;
+                //     that.pause = !that.pause;
+                // });
             });
+            // this.player.on("click", function(e) {
+            //     console.log("click事件", e);
+            // });
         },
 
         initHlsVideo() {
             let videoSrc = "http://ivi.bupt.edu.cn/hls/cctv1.m3u8";
             // let videoSrc = "https://test-streams.mux.dev/test_001/stream.m3u8";
             let config = {
-                liveDurationInfinity:true,
-                liveSyncDurationCount:3
-            }
-            this.hlsPlayer = new Hls(config);
+                autoStartLoad: true,
+                startPosition: -1,
+                capLevelToPlayerSize: false,
+                debug: false,
+                defaultAudioCodec: undefined,
+                initialLiveManifestSize: 1,
+                maxBufferLength: 30,
+                maxMaxBufferLength: 600,
+                maxBufferSize: 60 * 1000 * 1000,
+                maxBufferHole: 0.5,
+                maxSeekHole: 2,
+                lowBufferWatchdogPeriod: 0.5,
+                highBufferWatchdogPeriod: 3,
+                nudgeOffset: 0.1,
+                nudgeMaxRetry: 3,
+                maxFragLookUpTolerance: 0.2,
+                liveSyncDurationCount: 3,
+                liveMaxLatencyDurationCount: 10,
+                enableWorker: true,
+                enableSoftwareAES: true,
+                manifestLoadingTimeOut: 10000,
+                manifestLoadingMaxRetry: 1,
+                manifestLoadingRetryDelay: 500,
+                manifestLoadingMaxRetryTimeout: 64000,
+                startLevel: undefined,
+                levelLoadingTimeOut: 10000,
+                levelLoadingMaxRetry: 4,
+                levelLoadingRetryDelay: 500,
+                levelLoadingMaxRetryTimeout: 64000,
+                fragLoadingTimeOut: 20000,
+                fragLoadingMaxRetry: 6,
+                fragLoadingRetryDelay: 500,
+                fragLoadingMaxRetryTimeout: 64000,
+                startFragPrefetch: false,
+                appendErrorMaxRetry: 3,
+                enableCEA708Captions: true,
+                stretchShortVideoTrack: false,
+                forceKeyFrameOnDiscontinuity: true,
+                abrEwmaFastLive: 5.0,
+                abrEwmaSlowLive: 9.0,
+                abrEwmaFastVoD: 4.0,
+                abrEwmaSlowVoD: 15.0,
+                abrEwmaDefaultEstimate: 500000,
+                abrBandWidthFactor: 0.8,
+                abrBandWidthUpFactor: 0.7,
+                minAutoBitrate: 0,
+            };
             if (Hls.isSupported()) {
-            this.hlsPlayer.loadSource(videoSrc);
-            this.hlsPlayer.attachMedia(this.$refs.videoHls);
-            this.hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                    console.log('加载成功');
+                this.date = 1;
+                this.hlsPlayer = new Hls();
+                this.hlsPlayer.loadSource(videoSrc);
+                this.hlsPlayer.attachMedia(this.$refs.videoHls);
+                this.hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                    console.log("加载成功");
                     // this.video.play();
                 });
-              this.hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
-                // console.log(event, data);
-                // 监听出错事件
-                console.log('加载失败');
-              });
-            } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-            this.$refs.videoHls.src = videoSrc;
-            console.log(this.$refs.videoHls)
-            }else{
-                alert('不支持视频播放')
+                this.hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
+                    // 监听出错事件
+                    console.log("加载失败");
+                    console.log(event, data);
+                });
+            } else if (this.$refs.videoHls.canPlayType("application/vnd.apple.mpegurl")) {
+                this.$refs.videoHls.src = videoSrc
+                this.date = 2;
+                this.number = this.$refs.videoHls.canPlayType("application/vnd.apple.mpegurl");
+            } else {
+                this.date = 3;
+                this.number = "不支持视频播放";
             }
         },
         videoControl() {
@@ -195,14 +241,14 @@ export default {
         },
     },
     beforeDestroy() {
-        // if (this.player) {
-        //     this.player.dispose();
-        // }
-        if (this.hlsPlayer) {
-            this.$refs.videoHls.pause();
-            this.hlsPlayer.destroy();
-            this.hlsPlayer = null;
+        if (this.player) {
+            this.player.dispose();
         }
+        // if (this.hlsPlayer) {
+        //     this.$refs.videoHls.pause();
+        //     this.hlsPlayer.destroy();
+        //     this.hlsPlayer = null;
+        // }
     },
 };
 </script>
