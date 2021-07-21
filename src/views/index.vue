@@ -1,15 +1,18 @@
 <!--
  * @Author: Yokee
  * @Date: 2021-07-14 10:10:47
- * @LastEditTime: 2021-07-20 15:22:52
+ * @LastEditTime: 2021-07-21 15:33:33
  * @FilePath: \h5video\src\views\index.vue
 -->
 <template>
     <div class="container">
-        <div class="videoContent" >
+        <div id="videoPlayer" class="videoContainer">
+            <!-- <div class="text" @click="test">点我点我点点我</div> -->
+        </div>
+        <div class="videoContent">
             <!-- video.js -->
             <!-- playsinline="true" 取消ios端自动全屏 -->
-            <video
+            <!-- <video
                 id="videoPlayer"
                 class="video-js vjs-default-skin vjs-big-play-centered"
                 style="width: 100%; height: 100%"
@@ -26,7 +29,7 @@
                         supports HTML5 video
                     </a>
                 </p>
-            </video>
+            </video> -->
 
             <!-- hls.js -->
             <!-- <video
@@ -45,7 +48,7 @@
 </template>
 
 <script>
-import videojs from "video.js";
+// import videojs from "video.js";
 import Hls from "hls.js";
 export default {
     data() {
@@ -79,8 +82,9 @@ export default {
         };
     },
     mounted() {
-        this.initVideo();
+        // this.initVideo();
         // this.initHlsVideo();
+        this.initTcVideo();
     },
     methods: {
         initVideo() {
@@ -222,13 +226,113 @@ export default {
                     console.log(event, data);
                 });
             } else if (this.$refs.videoHls.canPlayType("application/vnd.apple.mpegurl")) {
-                this.$refs.videoHls.src = videoSrc
+                this.$refs.videoHls.src = videoSrc;
                 this.date = 2;
                 this.number = this.$refs.videoHls.canPlayType("application/vnd.apple.mpegurl");
             } else {
                 this.date = 3;
                 this.number = "不支持视频播放";
             }
+        },
+        initTcVideo() {
+            var player = new TcPlayer("videoPlayer", {
+                m3u8: "http://ivi.bupt.edu.cn/hls/cctv6.m3u8", //请替换成实际可用的播放地址
+                m3u8_hd:" http://ivi.bupt.edu.cn/hls/cctv6hd.m3u8",
+                rtmp:"rtmp://58.200.131.2:1935/livetv/cctv1",
+                autoplay: true, //iOS 下 safari 浏览器，以及大部分移动端浏览器是不开放视频自动播放这个能力的
+                live: true, //设置视频是否为直播类型，将决定是否渲染时间轴等控件，以及区分点直播的处理逻辑。
+                poster: {
+                    style: "cover",
+                    src:
+                        "https://img1.baidu.com/it/u=2699821401,1244104801&fm=26&fmt=auto&gp=0.jpg",
+                },
+                controls: "default", //default 显示默认控件，none 不显示控件，system 移动端显示系统控件。
+                systemFullscreen: true,
+                x5_player:true,
+                x5_type:true,
+                x5_fullscreen:true,
+                x5_orientation:1,
+                width: "100%", //视频的显示宽度，请尽量使用视频分辨率宽度
+                height: "100%", //视频的显示高度，请尽量使用视频分辨率高度
+                listener: function(msg) {
+                    console.log(msg);
+                    if (msg.type == "error") {
+                        switch (msg.detail.code) {
+                            case 1:
+                                console.log("网络错误，请检查网络配置或者播放链接是否正确。");
+                                break;
+                            case 2:
+                                console.log("视频格式 Web 播放器无法解码。");
+                                break;
+                            case 3:
+                                console.log("视频解码错误。");
+                                break;
+                            case 4:
+                                console.log("当前系统环境不支持播放该视频格式。");
+                                break;
+                            case 5:
+                                console.log(
+                                    "播放器判断当前浏览器环境不支持播放传入的视频，可能是当前浏览器不支持 MSE 或者 Flash 插件未启用。"
+                                );
+                                break;
+                            case 13:
+                                console.log("直播已结束，请稍后再来。");
+                                break;
+                            case 1001:
+                                console.log("断网了");
+                                break;
+                            case 1002:
+                                console.log("获取视频失败，请检查播放链接是否有效。");
+                                break;
+                            case 2048:
+                                console.log("无法加载视频文件，跨域访问被拒绝。");
+                                break;
+                            default:
+                                console.log("出错了");
+                                break;
+                        }
+                    }
+                    if (msg.type == "load") {
+                        console.log("load执行");
+                    }
+                    // if (msg.type == "timeupdate") {
+                    //     console.log("timeupdate");
+                    // }
+                    if (msg.type == "loadeddata") {
+                        console.log("loadeddata");
+                    }
+                    if (msg.type == "progress") {
+                        console.log("progress");
+                    }
+                    if (msg.type == "play") {
+                        console.log("play");
+                    }
+                    if (msg.type == "playing") {
+                        console.log("playing");
+                    }
+                    if (msg.type == "pause") {
+                        console.log("pause");
+                    }
+                    if (msg.type == "ended") {
+                        console.log("ended");
+                    }
+                    if (msg.type == "seeking") {
+                        console.log("seeking");
+                    }
+                    if (msg.type == "seeked") {
+                        console.log("seeked");
+                    }
+                    if (msg.type == "resize") {
+                        console.log("resize");
+                    }
+                    // if (msg.type == "volumechange") {
+                    //     console.log("volumechange");
+                    // }
+                },
+            });
+        },
+        test(){
+            this.number="电力我"
         },
         videoControl() {
             if (this.$refs.videoHls.paused) {
@@ -258,10 +362,31 @@ export default {
     width: 100%;
     min-height: 100vh;
 }
+.videoContainer {
+    width: 100%;
+    /* height: 30vh; */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.text{
+    position: absolute;
+    font-size: 18px;
+    color: #fff;
+    left: 50%;
+    top: 50%;
+    z-index: 10;
+}
+
+
 .videoContent {
     width: 100%;
-    height: 30vh;
+    /* height: 30vh; */
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .video {
     width: 100%;
