@@ -1,4 +1,4 @@
 node_modules
 
 .mp4
-src/assets/video.mp4
+*.mp4
