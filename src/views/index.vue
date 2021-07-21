@@ -1,7 +1,7 @@
 <!--
  * @Author: Yokee
  * @Date: 2021-07-14 10:10:47
- * @LastEditTime: 2021-07-21 15:33:33
+ * @LastEditTime: 2021-07-21 17:22:38
  * @FilePath: \h5video\src\views\index.vue
 -->
 <template>
@@ -79,6 +79,7 @@ export default {
             hlsPlayer: null,
             hlsPause: false,
             videoSrc: "http://ivi.bupt.edu.cn/hls/cctv1.m3u8",
+            tcPlayer:null,
         };
     },
     mounted() {
@@ -235,10 +236,10 @@ export default {
             }
         },
         initTcVideo() {
-            var player = new TcPlayer("videoPlayer", {
+            this.tcPlayer = new TcPlayer("videoPlayer", {
                 m3u8: "http://ivi.bupt.edu.cn/hls/cctv6.m3u8", //请替换成实际可用的播放地址
-                m3u8_hd:" http://ivi.bupt.edu.cn/hls/cctv6hd.m3u8",
-                rtmp:"rtmp://58.200.131.2:1935/livetv/cctv1",
+                // m3u8_hd:"http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8",
+                rtmp: "rtmp://58.200.131.2:1935/livetv/cctv1",
                 autoplay: true, //iOS 下 safari 浏览器，以及大部分移动端浏览器是不开放视频自动播放这个能力的
                 live: true, //设置视频是否为直播类型，将决定是否渲染时间轴等控件，以及区分点直播的处理逻辑。
                 poster: {
@@ -248,12 +249,17 @@ export default {
                 },
                 controls: "default", //default 显示默认控件，none 不显示控件，system 移动端显示系统控件。
                 systemFullscreen: true,
-                x5_player:true,
-                x5_type:true,
-                x5_fullscreen:true,
-                x5_orientation:1,
+                x5_player: true,
+                x5_type: true,
+                x5_fullscreen: true,
+                x5_orientation: 1,
                 width: "100%", //视频的显示宽度，请尽量使用视频分辨率宽度
                 height: "100%", //视频的显示高度，请尽量使用视频分辨率高度
+                wording: {
+                    //定义错误提示语
+                    2032: "请求视频失败，请检查网络",
+                    2048: "请求m3u8文件失败，可能是网络错误或者跨域问题",
+                },
                 listener: function(msg) {
                     console.log(msg);
                     if (msg.type == "error") {
@@ -331,8 +337,8 @@ export default {
                 },
             });
         },
-        test(){
-            this.number="电力我"
+        test() {
+            this.number = "电力我";
         },
         videoControl() {
             if (this.$refs.videoHls.paused) {
@@ -370,7 +376,7 @@ export default {
     align-items: center;
     justify-content: center;
 }
-.text{
+.text {
     position: absolute;
     font-size: 18px;
     color: #fff;
@@ -378,7 +384,6 @@ export default {
     top: 50%;
     z-index: 10;
 }
-
 
 .videoContent {
     width: 100%;
