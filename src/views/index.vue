@@ -1,7 +1,7 @@
 <!--
  * @Author: Yokee
  * @Date: 2021-07-14 10:10:47
- * @LastEditTime: 2021-07-21 17:22:38
+ * @LastEditTime: 2021-07-22 10:06:11
  * @FilePath: \h5video\src\views\index.vue
 -->
 <template>
@@ -339,6 +339,7 @@ export default {
         },
         test() {
             this.number = "电力我";
+            
         },
         videoControl() {
             if (this.$refs.videoHls.paused) {
