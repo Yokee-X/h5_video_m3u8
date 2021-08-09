@@ -1,13 +1,14 @@
 <!--
  * @Author: Yokee
  * @Date: 2021-07-14 10:10:47
- * @LastEditTime: 2021-07-22 10:06:11
+ * @LastEditTime: 2021-08-09 13:54:44
  * @FilePath: \h5video\src\views\index.vue
 -->
 <template>
     <div class="container">
         <div id="videoPlayer" class="videoContainer">
             <!-- <div class="text" @click="test">点我点我点点我</div> -->
+            <!-- <div class="pause" v-show="tcPause" @click="playAndPause"></div> -->
         </div>
         <div class="videoContent">
             <!-- video.js -->
@@ -79,7 +80,8 @@ export default {
             hlsPlayer: null,
             hlsPause: false,
             videoSrc: "http://ivi.bupt.edu.cn/hls/cctv1.m3u8",
-            tcPlayer:null,
+            tcPlayer: null,
+            tcPause:false,
         };
     },
     mounted() {
@@ -236,6 +238,7 @@ export default {
             }
         },
         initTcVideo() {
+            let that = this
             this.tcPlayer = new TcPlayer("videoPlayer", {
                 m3u8: "http://ivi.bupt.edu.cn/hls/cctv6.m3u8", //请替换成实际可用的播放地址
                 // m3u8_hd:"http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8",
@@ -261,7 +264,6 @@ export default {
                     2048: "请求m3u8文件失败，可能是网络错误或者跨域问题",
                 },
                 listener: function(msg) {
-                    console.log(msg);
                     if (msg.type == "error") {
                         switch (msg.detail.code) {
                             case 1:
@@ -306,31 +308,41 @@ export default {
                     // }
                     if (msg.type == "loadeddata") {
                         console.log("loadeddata");
+                        console.log(msg);
                     }
                     if (msg.type == "progress") {
                         console.log("progress");
+                        console.log(msg);
                     }
                     if (msg.type == "play") {
+                        that.tcPause = false
                         console.log("play");
+                        console.log(msg);
                     }
                     if (msg.type == "playing") {
                         console.log("playing");
+                        console.log(msg);
                     }
                     if (msg.type == "pause") {
+                        that.tcPause = true
                         console.log("pause");
+                        console.log(msg);
                     }
                     if (msg.type == "ended") {
                         console.log("ended");
+                        console.log(msg);
                     }
                     if (msg.type == "seeking") {
                         console.log("seeking");
+                        console.log(msg);
                     }
                     if (msg.type == "seeked") {
                         console.log("seeked");
+                        console.log(msg);
                     }
-                    if (msg.type == "resize") {
-                        console.log("resize");
-                    }
+                    // if (msg.type == "resize") {
+                    //     console.log("resize");
+                    // }
                     // if (msg.type == "volumechange") {
                     //     console.log("volumechange");
                     // }
@@ -338,8 +350,12 @@ export default {
             });
         },
         test() {
+            this.tcPlayer.fullscreen(true);
             this.number = "电力我";
-            
+        },
+        playAndPause(){
+            this.tcPlayer.togglePlay()
+            this.tcPause = !this.tcPause
         },
         videoControl() {
             if (this.$refs.videoHls.paused) {
@@ -409,6 +425,8 @@ export default {
     margin: -20px 0 0 -20px;
     background: rgba(255, 255, 255, 0.5);
     border: 2px solid #fff;
+    z-index: 10;
+
 }
 .pause:hover {
     background: rgba(255, 255, 255, 0.7);
