@@ -7,17 +7,21 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "@videojs/http-streaming": "^2.9.1",
-    "core-js": "^2.6.5",
+    "@videojs/http-streaming": "^2.10.0",
+    "amfe-flexible": "^2.2.1",
+    "element-ui": "^2.15.5",
     "hls.js": "^1.0.7",
-    "video.js": "^7.13.3",
+    "swiper": "^6.8.1",
+    "video.js": "^7.10.2",
     "videojs-contrib-hls": "^5.15.0",
     "vue": "^2.6.10",
+    "vue-awesome-swiper": "^4.1.1",
     "vue-router": "^3.5.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",
     "@vue/cli-service": "^3.8.0",
+    "postcss-pxtorem": "^5.1.1",
     "vue-template-compiler": "^2.6.10"
   }
 }
