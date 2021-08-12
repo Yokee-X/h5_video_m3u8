@@ -1,7 +1,7 @@
 <!--
  * @Author: Yokee
  * @Date: 2021-07-13 17:00:21
- * @LastEditTime: 2021-08-10 18:03:55
+ * @LastEditTime: 2021-08-12 16:15:34
  * @FilePath: \h5video\src\App.vue
 -->
 <template>
@@ -33,5 +33,9 @@ input{
 }
 textarea{
   outline: 0;
+}
+.clear-fix{
+  overflow: hidden;
+  clear: both;
 }
 </style>

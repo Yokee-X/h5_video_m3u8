@@ -1,7 +1,7 @@
 /*
  * @Author: Yokee
  * @Date: 2021-07-13 17:00:21
- * @LastEditTime: 2021-08-12 10:09:45
+ * @LastEditTime: 2021-08-12 14:27:37
  * @FilePath: \h5video\src\main.js
  */
 import Vue from 'vue'
@@ -10,11 +10,14 @@ import router from './router'
 
 import 'amfe-flexible/index.js';
 
-import {Input,Message,Carousel,CarouselItem,} from 'element-ui';
+import {Input,Message,} from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 import 'swiper/swiper-bundle.css'
+import { Popup } from 'vant';
+import 'vant/lib/index.css';
 
+Vue.use(Popup);
 
 // import 'video.js/dist/video-js.css' // 引入样式
 Vue.prototype.$message = Message;

@@ -12,6 +12,7 @@
     "element-ui": "^2.15.5",
     "hls.js": "^1.0.7",
     "swiper": "^6.8.1",
+    "vant": "^2.12.25",
     "video.js": "^7.10.2",
     "videojs-contrib-hls": "^5.15.0",
     "vue": "^2.6.10",

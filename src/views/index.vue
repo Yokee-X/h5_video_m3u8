@@ -1,13 +1,14 @@
 <!--
  * @Author: Yokee
  * @Date: 2021-07-14 10:10:47
- * @LastEditTime: 2021-08-12 10:17:33
+ * @LastEditTime: 2021-08-12 16:17:45
  * @FilePath: \h5video\src\views\index.vue
 -->
 <template>
     <div class="container">
         <!-- 视频 -->
         <my-video />
+        <div class="clear-fix"></div>
         <!-- 倒计时 -->
         <div class="countdown">
             <count-down :date="date"></count-down>
@@ -20,6 +21,8 @@
                 <span class="warning-text">开播提醒</span>
             </div>
         </div>
+        <div class="clear-fix"></div>
+
         <!-- 轮播控制栏 -->
         <div class="swiper-control">
             <div class="swiper-control-container">
@@ -39,8 +42,26 @@
                     {{ item }}
                 </div>
             </div>
-            <div class="subscribe">公众号</div>
+            <div class="subscribe" @click="subscribeShow = true">公众号</div>
         </div>
+        <van-popup v-model="subscribeShow" round class="popup">
+            <div>
+                <div class="popup-content">
+                    <div class="popup-title">谢谢你的关注</div>
+                    <div class="popup-text">
+                        "四川省预防医学会微平台"聚焦专业，关注健康
+                    </div>
+                    <img src="" alt="" class="popup-img" />
+                    <div class="popup-waning">长按二维码填写报名表</div>
+                </div>
+
+                <div class="popup-close" @click="subscribeShow = false">
+                    关闭
+                </div>
+            </div>
+        </van-popup>
+        <div class="clear-fix"></div>
+
         <!-- 中间轮播 -->
         <swiper
             ref="mySwiper"
@@ -50,7 +71,7 @@
                 observer: true,
                 observeParents: true,
             }"
-            style="width: 100%; flex: 1"
+            style="width: 100%; flex: 1;"
         >
             <swiper-slide style="background: #f6f6f6" class="scroll">
                 <div class="chat">
@@ -61,7 +82,32 @@
                     />
                 </div>
             </swiper-slide>
-            <swiper-slide style="background: red">Slide 2</swiper-slide>
+            <swiper-slide>
+                <div class="intro">
+                    <div class="introduce-content">
+                        <div class="introduce-title">四川省预防医学会</div>
+                        <div class="introduce-bottom">
+                            <div class="introduce-flex-row">
+                                <div class="introduce-flex-row">
+                                    <img
+                                        src="../assets/iconfont/clock.png"
+                                        class="introduce-icon1"
+                                        alt=""
+                                    />
+                                    <div class="introduce-status">未开始</div>
+                                </div>
+                                <div class="introduce-time">
+                                    2021年08月14日 18:53
+                                </div>
+                            </div>
+                            <div class="introduce-flex-row">
+                                <img class="introduce-icon2" src="../assets/iconfont/user.png" alt="">
+                                <span class="introduce-number">154</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </swiper-slide>
         </swiper>
         <div class="bottom">
             <!-- 底部输入框 -->
@@ -70,6 +116,7 @@
                     src="../assets/iconfont/smile.png"
                     alt=""
                     class="input-img"
+                    @click="show = !show"
                 />
                 <el-input
                     v-model="text"
@@ -78,23 +125,57 @@
                     placeholder="说点什么~"
                     resize="none"
                     class="input-content"
+                    @focus="focus"
                 >
                 </el-input>
                 <span class="input-text" @click="sendMsg">发送</span>
             </div>
-            
+            <!-- emoji -->
+            <transition name="slide-fade">
+                <div class="emoji-container" v-show="show">
+                    <swiper :options="{}" style="width: 100%; height: 100%">
+                        <swiper-slide
+                            v-for="(item, index) in emoji"
+                            :key="'swiper' + index"
+                        >
+                            <div class="emoji-content">
+                                <div
+                                    class="emoji-item"
+                                    v-for="(emojiItem, ind) in item"
+                                    :key="ind + 'emoji' + index"
+                                >
+                                    <span
+                                        v-if="emojiItem != 'del'"
+                                        @click="selectEmoji(emojiItem)"
+                                    >
+                                        {{ emojiItem }}</span
+                                    >
+                                    <img
+                                        v-else
+                                        src="../assets/iconfont/del.png"
+                                        class="del"
+                                        @click="deleteEmoji"
+                                    />
+                                </div>
+                            </div>
+                        </swiper-slide>
+                    </swiper>
+                </div>
+            </transition>
         </div>
     </div>
 </template>
 
 <script>
 import myVideo from "@/components/common/myVideo";
-
+import { emojilist, checkEmoji } from "@/utils/emoji";
 import countDown from "@/components/common/countDown";
 import bubble from "@//components/common/bubble";
+
 export default {
     data() {
         return {
+            emojilist,
             date: new Date("2021-08-17".replace(/-/g, "/")).getTime(),
             text: "", //输入框内容
             swiperIndex: 0, //轮播索引
@@ -132,8 +213,11 @@ export default {
                     msg: "432432",
                 },
             ],
+            subscribeShow: false, //公众号
+            show: false,
         };
     },
+    beforeMount() {},
     components: {
         countDown,
         bubble,
@@ -142,6 +226,21 @@ export default {
     computed: {
         swiper() {
             return this.$refs.mySwiper.swiperInstance;
+        },
+        emoji() {
+            let arr = [];
+            for (let i = 0; i < Math.ceil(this.emojilist.length / 20); i++) {
+                let temp = this.emojilist.slice(i * 20, (i + 1) * 20);
+                let len = temp.length;
+                if (len < 20) {
+                    for (let a = 0; a < 20 - len; a++) {
+                        temp.push("");
+                    }
+                }
+                arr.push([...temp, "del"]);
+            }
+            console.log(arr, "emoji");
+            return arr;
         },
     },
 
@@ -152,6 +251,7 @@ export default {
             this.swiper.slideTo(index);
         },
         sendMsg() {
+            //todo 发送新消息置低
             if (!this.text) {
                 this.$message.warning("不可发送空内容");
                 return;
@@ -166,12 +266,34 @@ export default {
             this.text = "";
             this.swiper.update();
         },
+        focus() {
+            this.show = false;
+        },
+        selectEmoji(item) {
+            this.text = this.text + item;
+        },
+        deleteEmoji() {
+            let isEmoji1 = checkEmoji(
+                this.text.slice(this.text.length - 1, this.text.length)
+            );
+            let isEmoji2 = checkEmoji(
+                this.text.slice(this.text.length - 2, this.text.length)
+            );
+            let len = 1;
+            if (isEmoji1) {
+                len = 1;
+            } else if (isEmoji2) {
+                len = 2;
+            }
+            this.text = this.text.slice(0, this.text.length - len);
+        },
     },
 };
 </script>
 
 <style scoped>
 .container {
+    overflow-x: hidden;
     width: 100%;
     height: 100%;
     display: flex;
@@ -247,6 +369,51 @@ export default {
     color: #fff;
     font-size: 15px;
 }
+.popup-content {
+    width: 100%;
+    height: 258px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    box-sizing: border-box;
+    padding-top: 18px;
+}
+.popup {
+    width: 300px;
+}
+.popup-title {
+    font-size: 17px;
+
+    color: #353535;
+    font-weight: bold;
+}
+.popup-text {
+    font-size: 13px;
+    font-weight: bold;
+    color: #333333;
+    margin: 12px 0 15px;
+}
+.popup-img {
+    width: 135px;
+    height: 135px;
+    margin-bottom: 11px;
+}
+.popup-waning {
+    font-size: 13px;
+    font-weight: bold;
+    color: #adadad;
+}
+.popup-close {
+    width: 100%;
+    height: 50px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    line-height: 50px;
+    color: #919499;
+    font-size: 17px;
+    font-weight: bold;
+}
 
 .scroll {
     overflow-y: scroll;
@@ -257,15 +424,69 @@ export default {
     justify-content: flex-end;
     width: 100%;
     background: #f6f6f6;
-    padding-bottom: 67px;
+    /* padding-bottom: 67px; */
+}
+
+.intro {
+    background: #fff;
+    width: 100%;
+}
+.introduce-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 80px;
+    border-bottom: 1px solid #dcdcdc;
+    box-sizing: border-box;
+    padding: 14px 12px 0;
+}
+.introduce-title {
+    font-size: 17px;
+    font-weight: bold;
+    color: #010000;
+}
+.introduce-bottom {
+    margin-top:17px ;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.introduce-flex-row{
+    display: flex;
+    align-items: center;
+}
+.introduce-icon1 {
+    width: 12px;
+    height: 12px;
+}
+.introduce-status {
+    font-size: 11px;
+    color: #00b645;
+    margin: 0 11px 0 5px;
+}
+.introduce-time {
+    font-size: 11px;
+    font-weight: bold;
+    color: #010000;
+}
+.introduce-icon2{
+    width: 13px;
+height: 14px;
+margin-right: 5px;
+}
+.introduce-number{
+font-size: 11px;
+font-weight: bold;
+color: #5C6067;
 }
 
 .bottom {
-    width: 375px;
-    position: fixed;
+    width: 100%;
+    /* position: fixed;
     bottom: 0;
     left: 0;
-    z-index: 99;
+    z-index: 99; */
 }
 
 .input-box {
@@ -300,5 +521,34 @@ export default {
 }
 /deep/.el-textarea__inner:focus {
     border-color: #c0c4cc;
+}
+
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+    transition: all 0.3s linear;
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+    transform: translateY(171px);
+    opacity: 0;
+}
+.emoji-container {
+    position: relative;
+    width: 100%;
+    height: 171px;
+    background: #fff;
+}
+.emoji-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+.emoji-item {
+    width: 32px;
+    margin: 0 10px 14px;
+}
+.del {
+    width: 32px;
 }
 </style>
